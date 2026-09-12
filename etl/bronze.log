@@ -1,0 +1,21 @@
++--------------------+----------+
+|       fonte        |  linhas  |
+|      varchar       |  int64   |
++--------------------+----------+
+| imdb_basics        | 12779198 |
+| imdb_ratings       |  1708603 |
+| movielens_links    |    87585 |
+| letterboxd_films   |   355141 |
+| letterboxd_ratings | 18175545 |
+| wikidata_ponte     |   269188 |
++--------------------+----------+
+
++-----------------+-------------+---------+---------+---------+---------+
+|   column_name   | column_type |  null   |   key   | default |  extra  |
+|     varchar     |   varchar   | varchar | varchar | varchar | varchar |
++-----------------+-------------+---------+---------+---------+---------+
+| imdb_id         | VARCHAR     | YES     | NULL    | NULL    | NULL    |
+| letterboxd_slug | VARCHAR     | YES     | NULL    | NULL    | NULL    |
+| tmdb_id         | INTEGER     | YES     | NULL    | NULL    | NULL    |
++-----------------+-------------+---------+---------+---------+---------+
+

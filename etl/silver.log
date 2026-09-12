@@ -1,0 +1,123 @@
++------------+------------------+
+| dim_titulo | tconst_distintos |
+|   int64    |      int64       |
++------------+------------------+
+|      17810 |            17810 |
++------------+------------------+
+
++--------+----------------+----------------+----------------------+-----------------+-----------+-------------+-----------+
+| linhas | imdb_distintos | slug_distintos | slug_distintos_lower | pares_distintos | imdb_nulo | imdb_nao_tt | slug_nulo |
+| int64  |     int64      |     int64      |        int64         |      int64      |   int64   |    int64    |   int64   |
++--------+----------------+----------------+----------------------+-----------------+-----------+-------------+-----------+
+| 269188 |         268372 |         268130 |               268130 |          268645 |         6 |           1 |         6 |
++--------+----------------+----------------+----------------------+-----------------+-----------+-------------+-----------+
+
++--------------------------------------------------+----------+--------+
+|                tipo_de_repeticao                 | imdb_ids | linhas |
+|                     varchar                      |  int64   | int128 |
++--------------------------------------------------+----------+--------+
+| slug e tmdb diferentes                           |      122 |    735 |
+| slug diferente                                   |      107 |    214 |
+| linha idêntica                                   |       65 |    134 |
+| mesmo slug, tmdb diferente (p4947 multivalorado) |       20 |     41 |
++--------------------------------------------------+----------+--------+
+
++-----------+------------------------------------+---------+
+|  imdb_id  |          letterboxd_slug           | tmdb_id |
+|  varchar  |              varchar               |  int32  |
++-----------+------------------------------------+---------+
+| tt0000979 | napoleon-and-the-empress-josephine |  284951 |
+| tt0000979 | napoleon-and-the-empress-josephine |  285386 |
+| tt0000979 | napoleon-the-man-of-destiny        |  284951 |
+| tt0000979 | napoleon-the-man-of-destiny        |  285386 |
+| tt0001593 | enoch-arden-1911                   |  190856 |
+| tt0001593 | enoch-arden-1911                   |  190857 |
+| tt0001593 | enoch-arden-1911                   |  483341 |
+| tt0001593 | enoch-arden-part-i                 |  190856 |
+| tt0001593 | enoch-arden-part-i                 |  190857 |
+| tt0001593 | enoch-arden-part-i                 |  483341 |
+| tt0001593 | enoch-arden-part-ii                |  190856 |
+| tt0001593 | enoch-arden-part-ii                |  190857 |
+| tt0001593 | enoch-arden-part-ii                |  483341 |
+| tt0001594 | enoch-arden-1911                   |  190856 |
+| tt0001594 | enoch-arden-1911                   |  190857 |
+| tt0001594 | enoch-arden-1911                   |  483341 |
+| tt0001594 | enoch-arden-part-i                 |  190856 |
+| tt0001594 | enoch-arden-part-i                 |  190857 |
+| tt0001594 | enoch-arden-part-i                 |  483341 |
+| tt0001594 | enoch-arden-part-ii                |  190856 |
++-----------+------------------------------------+---------+
+  20 rows                                        3 columns
+
++------------------------------------------------+-------+--------+
+|               tipo_de_repeticao                | slugs | linhas |
+|                    varchar                     | int64 | int128 |
++------------------------------------------------+-------+--------+
+| imdb diferente (imdb duplicado ou item errado) |   463 |   1371 |
+| mesmo imdb                                     |   123 |    267 |
++------------------------------------------------+-------+--------+
+
++--------+----------------+------------------------+-----------------------+------------------------------+------------------------+
+| pares  | imdb_distintos | pares_com_slug_ambiguo | imdb_com_slug_ambiguo | pares_com_slug_compartilhado | pares_com_tmdb_ambiguo |
+| int64  |     int64      |         int64          |         int64         |            int64             |         int64          |
++--------+----------------+------------------------+-----------------------+------------------------------+------------------------+
+| 268643 |         268371 |                    501 |                   229 |                          977 |                    285 |
++--------+----------------+------------------------+-----------------------+------------------------------+------------------------+
+
++-----------------+--------------+--------------------+--------------+
+| tconst_com_slug | slug_ambiguo | slug_compartilhado | tmdb_ambiguo |
+|      int64      |    int64     |       int64        |    int64     |
++-----------------+--------------+--------------------+--------------+
+|           17742 |            6 |                  9 |            3 |
++-----------------+--------------+--------------------+--------------+
+
++-----------------+---------+---------+-------+------------+
+| letterboxd_slug | tconst  | titulo  |  ano  | n_notas_lb |
+|     varchar     | varchar | varchar | int32 |   int64    |
++-----------------+---------+---------+-------+------------+
+                           0 rows                         
+
++-----------+------------------+----------+----------+
+| ponte_ids | tconst_distintos | com_tmdb | com_slug |
+|   int64   |      int64       |  int64   |  int64   |
++-----------+------------------+----------+----------+
+|     17810 |            17810 |    17781 |    17742 |
++-----------+------------------+----------+----------+
+
++-------------+--------+--------+
+| metodo_join | filmes |  pct   |
+|   varchar   | int64  | double |
++-------------+--------+--------+
+| ambos       |  16819 |   94.4 |
+| wikidata    |    904 |    5.1 |
+| movielens   |     39 |    0.2 |
+| nenhum      |     29 |    0.2 |
+| divergente  |     19 |    0.1 |
++-------------+--------+--------+
+
++------------+-----------------------------------------------+-------+-------------------+------------------+-----------------+----------------------------------------------+
+|   tconst   |                    titulo                     |  ano  | tmdb_id_movielens | tmdb_id_wikidata | n_tmdb_wikidata |               letterboxd_slug                |
+|  varchar   |                    varchar                    | int32 |       int32       |      int32       |      int64      |                   varchar                    |
++------------+-----------------------------------------------+-------+-------------------+------------------+-----------------+----------------------------------------------+
+| tt0056142  | King Kong vs. Godzilla                        |  1963 |              1680 |           686487 |               1 | king-kong-vs-godzilla-1963                   |
+| tt0076363  | The Many Adventures of Winnie the Pooh        |  1977 |             13716 |           250480 |               1 | the-many-adventures-of-winnie-the-pooh       |
+| tt0359715  | My Best Friend's Birthday                     |  1987 |             10614 |          1591239 |               1 | my-best-friends-birthday                     |
+| tt0096913  | Best of the Best                              |  1989 |             17882 |           238751 |               1 | best-of-the-best                             |
+| tt0100232  | Navy Seals                                    |  1990 |             12773 |           427910 |               1 | navy-seals                                   |
+| tt0112389  | The Thief and the Cobbler                     |  1993 |            185441 |            26672 |               1 | the-thief-and-the-cobbler                    |
+| tt0109555  | Darr                                          |  1993 |             74309 |            35053 |               1 | darr                                         |
+| tt0424024  | Darwin's Nightmare                            |  2004 |             10700 |           415253 |               1 | darwins-nightmare                            |
+| tt0859765  | Still Life                                    |  2006 |            155796 |             2346 |               1 | still-life                                   |
+| tt0839995  | Superman II: The Richard Donner Cut           |  2006 |            429486 |           624479 |               1 | superman-ii-the-richard-donner-cut           |
+| tt0478813  | The Trap                                      |  2007 |             71370 |             4352 |               1 | the-trap-2007                                |
+| tt1113829  | George Harrison: Living in the Material World |  2011 |             75964 |          1676821 |               1 | george-harrison-living-in-the-material-world |
+| tt0448694  | Puss in Boots                                 |  2011 |             58423 |           417859 |               1 | puss-in-boots                                |
+| tt1937390  | Nymphomaniac: Vol. I                          |  2013 |            110414 |           258216 |               1 | nymphomaniac-volume-i                        |
+| tt3526810  | Adolf Hitler: The Greatest Story Never Told   |  2013 |            250880 |          1760423 |               1 | adolf-hitler-the-greatest-story-never-told   |
+| tt5990066  | Bad Match                                     |  2017 |            468554 |           429727 |               1 | bad-match                                    |
+| tt2250912  | Spider-Man: Homecoming                        |  2017 |            202249 |           315635 |               1 | spider-man-homecoming                        |
+| tt8478602  | Godzilla: The Planet Eater                    |  2018 |            536927 |           536115 |               1 | godzilla-the-planet-eater                    |
+| tt13381376 | Welcome Home                                  |  2020 |            761129 |           761226 |               1 | welcome-home-2020                            |
++------------+-----------------------------------------------+-------+-------------------+------------------+-----------------+----------------------------------------------+
+  19 rows                                                                                                                                                          7 columns
+
