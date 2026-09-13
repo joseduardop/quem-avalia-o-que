@@ -6,6 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 raiz="$PWD"
 py="$raiz/ops/venv-gestao/bin/python"
+[ -x "$py" ] || py=python3   # extrair zip não precisa do venv; o kaggle precisa (mensagem abaixo)
 landing="$raiz/datalake/landing"
 mkdir -p "$landing"
 cd "$landing"
@@ -19,13 +20,27 @@ for f in title.basics title.ratings title.akas; do
 done
 
 # movielens: https://grouplens.org/datasets/movielens/ (ml-1m tem demografia, ml-32m tem links.csv e timestamp)
+# o certificado tls de files.grouplens.org venceu em 28/08/2026 e não foi renovado: se o curl normal falhar,
+# baixa sem verificar o certificado e confere o md5 contra o da cópia que gerou este projeto (bate com o
+# md5 que o grouplens publica ao lado de cada zip)
+md5_movielens() {
+  case "$1" in
+    ml-1m.zip) echo "c4d9eecfca2ab87c1945afe126590906" ;;
+    ml-32m.zip) echo "d472be332d4daa821edc399621853b57" ;;
+  esac
+}
 for d in ml-1m ml-32m; do
-  baixar "https://files.grouplens.org/datasets/movielens/$d.zip" "$d.zip"
+  url="https://files.grouplens.org/datasets/movielens/$d.zip"
+  if [ ! -f "$d.zip" ]; then
+    curl -fL --retry 3 -o "$d.zip" "$url" || { echo "tls do grouplens falhou, baixando sem verificar o certificado"; curl -fL --retry 3 -k -o "$d.zip" "$url"; }
+  fi
+  echo "$(md5_movielens "$d.zip")  $d.zip" | md5sum -c - || { echo "md5 de $d.zip não bate com o esperado, apague e baixe de novo"; exit 1; }
   [ -d "$d" ] || "$py" -m zipfile -e "$d.zip" .
 done
 
 # letterboxd: dataset de freeth no kaggle, amostra de 11 mil usuários, dump de 2023-10-10
 if [ ! -d letterboxd-film-ratings ]; then
+  [ -x "$raiz/ops/venv-gestao/bin/kaggle" ] || { echo "falta o cli do kaggle: crie o venv e instale o requirements.txt antes"; exit 1; }
   "$raiz/ops/venv-gestao/bin/kaggle" datasets download -d freeth/letterboxd-film-ratings -p .
   mkdir -p letterboxd-film-ratings
   "$py" -m zipfile -e letterboxd-film-ratings.zip letterboxd-film-ratings
