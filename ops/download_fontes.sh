@@ -11,7 +11,19 @@ landing="$raiz/datalake/landing"
 mkdir -p "$landing"
 cd "$landing"
 
-baixar() { [ -f "$2" ] && echo "já existe: $2" || curl -fL --retry 3 -o "$2" "$1"; }
+# baixa com retomada: escreve em .part, continua de onde parou se a conexão cair, e só renomeia quando termina
+# uso: baixar url destino [flags extras do curl]
+baixar() {
+  local url="$1" destino="$2" tentativa
+  shift 2
+  [ -f "$destino" ] && { echo "já existe: $destino"; return 0; }
+  for tentativa in 1 2 3 4 5; do
+    curl -fL -C - --retry 3 "$@" -o "$destino.part" "$url" && { mv "$destino.part" "$destino"; return 0; }
+    echo "conexão caiu na tentativa $tentativa de $destino; retomando em 10 s (se não sair do lugar, apague o .part)"
+    sleep 10
+  done
+  return 1
+}
 
 # imdb: https://developer.imdb.com/non-commercial-datasets/ (uso não comercial)
 for f in title.basics title.ratings title.akas; do
@@ -29,12 +41,19 @@ md5_movielens() {
     ml-32m.zip) echo "d472be332d4daa821edc399621853b57" ;;
   esac
 }
+flags_grouplens=""
+curl -fsSI https://files.grouplens.org/ >/dev/null 2>&1 || { echo "tls do grouplens falhou (certificado vencido); baixando sem verificar o certificado, com md5 conferido"; flags_grouplens="-k"; }
+md5_ok() { echo "$(md5_movielens "$1")  $1" | md5sum -c - >/dev/null 2>&1; }
 for d in ml-1m ml-32m; do
   url="https://files.grouplens.org/datasets/movielens/$d.zip"
-  if [ ! -f "$d.zip" ]; then
-    curl -fL --retry 3 -o "$d.zip" "$url" || { echo "tls do grouplens falhou, baixando sem verificar o certificado"; curl -fL --retry 3 -k -o "$d.zip" "$url"; }
+  baixar "$url" "$d.zip" $flags_grouplens
+  if ! md5_ok "$d.zip"; then
+    echo "$d.zip incompleto (md5 não bate); retomando o download"
+    mv "$d.zip" "$d.zip.part"
+    baixar "$url" "$d.zip" $flags_grouplens
+    md5_ok "$d.zip" || { echo "md5 de $d.zip ainda não bate; apague $d.zip e rode de novo"; exit 1; }
   fi
-  echo "$(md5_movielens "$d.zip")  $d.zip" | md5sum -c - || { echo "md5 de $d.zip não bate com o esperado, apague e baixe de novo"; exit 1; }
+  echo "$d.zip: md5 ok"
   [ -d "$d" ] || "$py" -m zipfile -e "$d.zip" .
 done
 
