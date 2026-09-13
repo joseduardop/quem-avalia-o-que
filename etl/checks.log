@@ -1,0 +1,28 @@
+ok    dim_titulo tem 17.810 linhas                                               0
+ok    dim_titulo: tconst único                                                   0
+ok    dim_titulo: ano entre 1930 e 2023 e decada = ano // 10 * 10                0
+ok    dim_titulo: pct_votos_decada entre 0 e 1, sem nulo                         0
+ok    dim_titulo: pais_unico preenchido se e só se n_paises = 1                  0
+ok    dim_titulo: n_paises e tem_us batem com titulo_pais                        0
+ok    titulo_pais: sem duplicata (tconst, pais)                                  0
+ok    ponte_ids: uma linha por tconst do dim_titulo, nem mais nem menos          0
+ok    ponte_ids: metodo_join só com valores conhecidos                           0
+ok    tmdb_titulo: uma linha por tconst e imdb_id == tconst                      0
+ok    tmdb_titulo: classificacao_br só L/10/12/14/16/18                          0
+ok    fato_notas: todo tconst existe no dim_titulo                               0
+ok    fato_notas: sem duplicata (tconst, plataforma)                             0
+ok    fato_notas: plataforma só imdb/tmdb/letterboxd/ml32                        0
+ok    fato_notas: nota dentro de escala_min e escala_max                         0
+ok    fato_notas: n_votos > 0                                                    0
+ok    fato_notas: data_coleta e tipo_medida preenchidos                          0
+ok    fato_notas: imdb cobre o frame inteiro                                     0
+ok    fato_notas_demografia: sem duplicata (tconst, faixa, gênero)               0
+ok    fato_notas_demografia: nota_media entre 1 e 5, n_notas > 0, tipo janela    0
+ok    fato_notas_demografia: soma de n_notas bate com o ml-1m filtrado no frame  0
+ok    notas_normalizadas: n_votos >= 30, z finito, pct entre 0 e 1               0
+ok    divergencia_par: plataforma_a < plataforma_b e sem duplicata               0
+ok    divergencia_par: gap_z = z_b - z_a                                         0
+ok    deriva_ml32: n_notas > 0 e ano entre 1995 e 2023                           0
+ok    gradiente_idade: as 7 faixas                                               0
+
+26/26 checks ok
