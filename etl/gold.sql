@@ -154,7 +154,7 @@ copy cobertura_top200_decada to 'datalake/gold/cobertura_top200_decada.parquet' 
 -- década x quartil de posição dentro da década (pct_votos_decada do dim_titulo)
 -- é o casamento de selecionabilidade de verdade: top 200 não casa, porque nos anos 1930 é o frame
 -- inteiro (piso 5k votos) e nos 2010 é quem tem 421k+ votos, 3,5% da década
-create table cobertura_decada_quartil as
+create table cobertura_canonicidade as
 select
   e.decada,
   case
@@ -173,8 +173,8 @@ from elos e
 join dim_titulo d using (tconst)
 group by 1, 2
 order by 1, 2;
-select * from cobertura_decada_quartil;
-copy cobertura_decada_quartil to 'datalake/gold/cobertura_decada_quartil.parquet' (format parquet);
+select * from cobertura_canonicidade;
+copy cobertura_canonicidade to 'datalake/gold/cobertura_canonicidade.parquet' (format parquet);
 
 -- a mesma coisa em uma linha por década, pra ler de relance (% com 100+ notas)
 select
@@ -183,6 +183,6 @@ select
   max(pct_100) filter (where quartil = 'q3') as q3,
   max(pct_100) filter (where quartil = 'q2') as q2,
   max(pct_100) filter (where quartil like 'q1%') as q1_base
-from cobertura_decada_quartil
+from cobertura_canonicidade
 group by 1
 order by 1;

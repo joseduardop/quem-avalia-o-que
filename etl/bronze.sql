@@ -62,3 +62,38 @@ union all select 'letterboxd_ratings', count(*) from 'datalake/bronze/letterboxd
 union all select 'wikidata_ponte', count(*) from 'datalake/bronze/wikidata_ponte.parquet';
 
 describe select * from 'datalake/bronze/wikidata_ponte.parquet';
+
+-- movielens 1m: .dat com separador '::', sem cabeçalho, latin-1. age vem codificado (1, 18, 25, 35, 45, 50, 56)
+copy (
+  select * from read_csv('datalake/landing/ml-1m/users.dat', delim='::', header=false, encoding='latin-1',
+    columns={'user_id': 'integer', 'gender': 'varchar', 'age': 'integer', 'occupation': 'integer', 'zip': 'varchar'})
+) to 'datalake/bronze/ml1_users.parquet' (format parquet);
+
+copy (
+  select * from read_csv('datalake/landing/ml-1m/ratings.dat', delim='::', header=false,
+    columns={'user_id': 'integer', 'movie_id': 'integer', 'rating': 'integer', 'ts': 'bigint'})
+) to 'datalake/bronze/ml1_ratings.parquet' (format parquet);
+
+copy (
+  select * from read_csv('datalake/landing/ml-1m/movies.dat', delim='::', header=false, encoding='latin-1', quote='',
+    columns={'movie_id': 'integer', 'title': 'varchar', 'genres': 'varchar'})
+) to 'datalake/bronze/ml1_movies.parquet' (format parquet);
+
+-- movielens 32m: 32 milhões de notas com timestamp (1995-2023), a única fonte do projeto com dimensão temporal
+copy (
+  select * from read_csv('datalake/landing/ml-32m/ratings.csv', header=true,
+    types={'userId': 'integer', 'movieId': 'integer', 'rating': 'decimal(2,1)', 'timestamp': 'bigint'})
+) to 'datalake/bronze/ml32_ratings.parquet' (format parquet);
+
+-- agregado por filme e ano de avaliação: o que a análise de deriva consome, sem carregar os 32m
+copy (
+  select movieId, year(to_timestamp(timestamp)) as ano_avaliacao, count(*) as n_notas, round(avg(rating), 4) as nota_media
+  from 'datalake/bronze/ml32_ratings.parquet'
+  group by 1, 2
+) to 'datalake/bronze/ml32_por_ano.parquet' (format parquet);
+
+select 'ml1_users' as fonte, count(*) as linhas from 'datalake/bronze/ml1_users.parquet'
+union all select 'ml1_ratings', count(*) from 'datalake/bronze/ml1_ratings.parquet'
+union all select 'ml1_movies', count(*) from 'datalake/bronze/ml1_movies.parquet'
+union all select 'ml32_ratings', count(*) from 'datalake/bronze/ml32_ratings.parquet'
+union all select 'ml32_por_ano', count(*) from 'datalake/bronze/ml32_por_ano.parquet';

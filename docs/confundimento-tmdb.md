@@ -82,7 +82,7 @@ Consequências pra E1:
 - os anos 2020 têm um efeito extra: o dump do Letterboxd é de outubro de 2023, então até o Q4 cai (85,8%);
 - curiosidade que vale nota: os anos 2000 são a pior década no Q1 (26,6%), pior que os 2010. Meio-de-tabela velho demais pra ser cânone e novo demais pra nostalgia - hipótese, não achado.
 
-`datalake/gold/cobertura_top200_decada.parquet` e `datalake/gold/cobertura_decada_quartil.parquet`.
+`datalake/gold/cobertura_top200_decada.parquet` e `datalake/gold/cobertura_canonicidade.parquet`.
 
 ## B - crawl do TMDB
 
