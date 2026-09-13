@@ -5,8 +5,15 @@ Sessão 3. Continuação de `recon/relatorio.md` e `docs/ponte-wikidata.md`.
 ## Estado
 
 - **Tarefa A concluída.** Cross-tab, `pct_votos_decada`, top 200 e, além do briefing, década x quartil - que é a tabela que decide o veredito.
-- **Tarefa B pronta pra rodar, sem chamadas reais ainda.** O fluxo inteiro foi exercitado com a API mockada (`ops/teste_tmdb.py`): crawler com retomada, parser, validação, arbitragem, idempotência e gold. Falta só a credencial.
+- **Tarefa B concluída.** Crawl rodado em 13/09/2026 (17.858 requisições, 15,3 min, 559 MB), identidade validada em todo o frame, 19 divergências arbitradas, bronze/silver/gold do TMDB no lugar. Log em `ops/tmdb.log`.
 - Uma primeira versão do código foi revisada e corrigida antes de rodar: sobrescrita silenciosa de lote no crawler, join errado que ficava invisível na ponte, arbitragem que sumia ao rerodar o silver, memória do crawler. Detalhes na seção B.
+
+## tl;dr do TMDB
+
+- **17.805 dos 17.810 filmes do frame (99,97%) têm registro validado do TMDB** - `external_ids.imdb_id` igual ao tconst. 2 sem candidata válida, 3 sem id nenhum.
+- **Nas 19 divergências MovieLens x Wikidata, o Wikidata estava certo em 18 e o MovieLens em zero.** 15 dos ids do MovieLens eram entradas que o TMDB já apagou (404). A regra da sessão 2 ("MovieLens prevalece") estava errada em todos os casos; a validação corrigiu.
+- **País de origem: 99,6% do frame**, 71% com país único. É o eixo de nacionalidade que faltava. A ordem da lista nas coproduções não é confiável.
+- **Classificação indicativa BR: 39,6% do frame**, viés forte de recência (25% nos anos 1930, 54% nos 2020). A americana cobre 75%. Eixo utilizável, mas mais fraco que o de nacionalidade.
 
 ## A.1 - década x faixa de votos
 
@@ -142,10 +149,104 @@ Classificação: cinema (type 3) primeiro, depois cinema limitado (2), depois qu
 4. **Memória.** O crawler guardava todas as respostas completas em RAM (30-70KB cada, x17,8k, em objeto Python dá alguns GB). Agora retém só status, `imdb_id` devolvido e ids do `/find`.
 5. Resposta 200 sem JSON era marcada como concluída e nunca refeita; agora cai no retry. A mensagem de credencial ausente mostrava os nomes das variáveis em minúsculas.
 
-## O que falta reportar (depois do crawl)
+## Resultados do crawl
 
-3. estatísticas do crawl - o `resumo()` do crawler e o topo do `silver_tmdb.log`
-4. linhas onde `external_ids.imdb_id` não bateu - primeira tabela do `silver_tmdb.log`
-5. arbitragem das 19 - `gold/arbitragem_tmdb.parquet`
-6. `production_countries` - `gold/cobertura_tmdb.parquet` e `gold/paises_tmdb_top20.parquet`
-7. classificação BR - `gold/classificacao_br.parquet`
+### 3. Estatísticas
+
+| fase | requisições | resultado |
+|---|---|---|
+| pré-voo | 1 | Fight Club, 0,62s |
+| `/find` pros sem id | 29 | 26 resolvidos, 3 sem resultado |
+| `/movie` | 17.826 | 17.781 da ponte + 19 candidatas do Wikidata + 26 do `/find`; 17.809 x 200, 17 x 404 |
+| `/find` de fallback (identidade falhou) | 2 | nenhum resultado |
+| total | 17.858 | 15,3 min, ~19 req/s, 0 falhas finais |
+
+559 MB em 20 arquivos JSONL em `datalake/landing/tmdb/` (18 lotes de `movie`, 2 de `find`). Bronze `tmdb_filmes.parquet` com 17.809 linhas (2,8 MB), silver `tmdb_titulo.parquet` com 17.805 (4,9 MB).
+
+### 4. Validação de identidade
+
+17.809 respostas 200 sobre 17.806 tconst. **17.805 batem**, 4 não:
+
+| tconst | título | fonte do id | id consultado | `imdb_id` devolvido |
+|---|---|---|---|---|
+| tt0056142 | King Kong vs. Godzilla | movielens | 1680 | tt13364334 |
+| tt0478813 | The Trap | movielens | 71370 | tt0497457 |
+| tt0859765 | Still Life | movielens | 155796 | tt1127347 |
+| tt25405130 | Dada (2023) | wikidata | 965979 | tt37431562 |
+
+Os três primeiros são divergências resolvidas pela candidata do Wikidata. O quarto é um `nao_validado`: o Wikidata aponta pra outro filme chamado Dada e o `/find` não acha nada. O outro `nao_validado` é My Best Friend's Birthday (tt0359715): as duas candidatas dão 404 e o `/find` não acha.
+
+`metodo_join` final na ponte:
+
+| metodo_join | filmes | % |
+|---|---|---|
+| ambos | 16.819 | 94,4 |
+| wikidata | 903 | 5,1 |
+| movielens | 39 | 0,2 |
+| tmdb_find | 26 | 0,1 |
+| arbitrado_tmdb | 18 | 0,1 |
+| nenhum | 3 | 0,0 |
+| nao_validado | 2 | 0,0 |
+
+### 5. Arbitragem das 19 divergências
+
+| fonte certa | casos |
+|---|---|
+| wikidata | 18 |
+| movielens | 0 |
+| nenhuma das duas | 1 |
+
+Dos 19 ids do MovieLens, 15 devolveram 404 - entradas que o TMDB fundiu ou apagou depois que o `links.csv` foi gerado - e 3 apontavam pra outro filme. O `links.csv` do ml-32m é de 2023 e não acompanha as fusões do TMDB; o Wikidata acompanha. A suspeita da sessão 2 (Spider-Man: Homecoming, 315635) se confirmou, e o padrão vale pra todos. Tabela completa em `datalake/gold/arbitragem_tmdb.parquet`.
+
+### 6. País de origem (`production_countries`)
+
+17.742 filmes (99,6%) com o campo preenchido; 63 sem. Países por filme: 1 em 71,0% (12.647), 2 em 18,7%, 3 em 6,3%, 4+ em 3,6%.
+
+| país | filmes | % do frame | como país único |
+|---|---|---|---|
+| US | 11.212 | 63,0 | 7.984 |
+| GB | 2.596 | 14,6 | 670 |
+| FR | 1.810 | 10,2 | 400 |
+| IN | 1.367 | 7,7 | 1.236 |
+| DE | 1.108 | 6,2 | 150 |
+| CA | 884 | 5,0 | 179 |
+| IT | 677 | 3,8 | 163 |
+| JP | 623 | 3,5 | 412 |
+| ES | 461 | 2,6 | 136 |
+| BE | 336 | 1,9 | 11 |
+| AU | 326 | 1,8 | 114 |
+| TR | 303 | 1,7 | 247 |
+| HK | 295 | 1,7 | 83 |
+| CN | 260 | 1,5 | 28 |
+| SE | 259 | 1,5 | 55 |
+| KR | 232 | 1,3 | 174 |
+| DK | 204 | 1,1 | 37 |
+| IE | 198 | 1,1 | 16 |
+| NL | 154 | 0,9 | 28 |
+| CH | 137 | 0,8 | 4 |
+
+Dá pra estratificar por nacionalidade, com duas ressalvas:
+
+- **A ordem da lista não é confiável.** Nas 5.095 coproduções, 58% vêm em ordem alfabética e o resto em ordem arbitrária (Alemanha Ano Zero, de Rossellini, vem `[FR, DE, IT]`). "Primeiro da lista" não serve como país principal.
+- Índia (90% como país único), Turquia (82%), Coreia (75%) e Japão (66%) são estratos limpos. GB, DE, CA, BE, IE e CH são majoritariamente coprodução, quase sempre com os EUA.
+
+Sugestão pra sessão 4: `pais` = o único país quando há um só (71% do frame); coprodução vira estrato próprio ou usa `original_language` como desempate (`[FR, US]` com `fr` -> FR). É decisão de modelagem, não está feita.
+
+### 7. Classificação indicativa brasileira
+
+O TMDB devolve texto livre (`12`, `12 ANOS`, `E 12`, `E LIVRE`, `LIVRE`, e uns `PG` do sistema americano). `silver/tmdb_titulo.classificacao_br` normaliza pra L/10/12/14/16/18; 9 valores não normalizáveis viram nulo (`PG`, `A`, `15`, `PG-13`, `6`). O texto original fica em `certificacao_br`, e `certificacao_br_tipo` diz de que lançamento veio (5.150 de cinema, 1.898 de digital/físico/TV).
+
+**7.048 filmes (39,6% do frame)** com classificação BR. Distribuição:
+
+| classificação | filmes | % das classificadas |
+|---|---|---|
+| L | 966 | 13,7 |
+| 10 | 410 | 5,8 |
+| 12 | 1.597 | 22,7 |
+| 14 | 1.948 | 27,6 |
+| 16 | 1.650 | 23,4 |
+| 18 | 477 | 6,8 |
+
+Por década a cobertura vai de 25% (anos 1930) a 54% (anos 2020). A americana (`certificacao_us`) cobre 75,2% do frame e é o fallback: 6.917 filmes têm só ela. O eixo de faixa etária existe, mas é bem mais fraco que o de nacionalidade e enviesado pra filme recente - no texto da E1 isso tem que estar dito.
+
+`datalake/gold/cobertura_tmdb.parquet`, `paises_tmdb_top20.parquet`, `classificacao_br.parquet`, `classificacao_br_decada.parquet`, `arbitragem_tmdb.parquet`.

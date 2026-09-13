@@ -1,0 +1,221 @@
+ops/venv-gestao/bin/python ops/crawl_tmdb.py --dry-run
+frame: 17810
+sem tmdb_id: 29
+divergentes: 19
+candidatos das divergências: 38
+
+---
+
+ops/venv-gestao/bin/python ops/crawl_tmdb.py
+frame: 17810
+sem tmdb_id: 29
+divergentes: 19
+candidatos das divergências: 38
+pré-voo ok: /movie/550 -> Fight Club (tt0137523), 0.62s
+find: 29/29
+movie: 100/17826
+movie: 200/17826
+movie: 300/17826
+movie: 400/17826
+movie: 500/17826
+movie: 600/17826
+movie: 700/17826
+movie: 800/17826
+movie: 900/17826
+movie: 1000/17826
+movie: 1100/17826
+movie: 1200/17826
+movie: 1300/17826
+movie: 1400/17826
+movie: 1500/17826
+movie: 1600/17826
+movie: 1700/17826
+movie: 1800/17826
+movie: 1900/17826
+movie: 2000/17826
+movie: 2100/17826
+movie: 2200/17826
+movie: 2300/17826
+movie: 2400/17826
+movie: 2500/17826
+movie: 2600/17826
+movie: 2700/17826
+movie: 2800/17826
+movie: 2900/17826
+movie: 3000/17826
+movie: 3100/17826
+movie: 3200/17826
+movie: 3300/17826
+movie: 3400/17826
+movie: 3500/17826
+movie: 3600/17826
+movie: 3700/17826
+movie: 3800/17826
+movie: 3900/17826
+movie: 4000/17826
+movie: 4100/17826
+movie: 4200/17826
+movie: 4300/17826
+movie: 4400/17826
+movie: 4500/17826
+movie: 4600/17826
+movie: 4700/17826
+movie: 4800/17826
+movie: 4900/17826
+movie: 5000/17826
+movie: 5100/17826
+movie: 5200/17826
+movie: 5300/17826
+movie: 5400/17826
+movie: 5500/17826
+movie: 5600/17826
+movie: 5700/17826
+movie: 5800/17826
+movie: 5900/17826
+movie: 6000/17826
+movie: 6100/17826
+movie: 6200/17826
+movie: 6300/17826
+movie: 6400/17826
+movie: 6500/17826
+movie: 6600/17826
+movie: 6700/17826
+movie: 6800/17826
+movie: 6900/17826
+movie: 7000/17826
+movie: 7100/17826
+movie: 7200/17826
+movie: 7300/17826
+movie: 7400/17826
+movie: 7500/17826
+movie: 7600/17826
+movie: 7700/17826
+movie: 7800/17826
+movie: 7900/17826
+movie: 8000/17826
+movie: 8100/17826
+movie: 8200/17826
+movie: 8300/17826
+movie: 8400/17826
+movie: 8500/17826
+movie: 8600/17826
+movie: 8700/17826
+movie: 8800/17826
+movie: 8900/17826
+movie: 9000/17826
+movie: 9100/17826
+movie: 9200/17826
+movie: 9300/17826
+movie: 9400/17826
+movie: 9500/17826
+movie: 9600/17826
+movie: 9700/17826
+movie: 9800/17826
+movie: 9900/17826
+movie: 10000/17826
+movie: 10100/17826
+movie: 10200/17826
+movie: 10300/17826
+movie: 10400/17826
+movie: 10500/17826
+movie: 10600/17826
+movie: 10700/17826
+movie: 10800/17826
+movie: 10900/17826
+movie: 11000/17826
+movie: 11100/17826
+movie: 11200/17826
+movie: 11300/17826
+movie: 11400/17826
+movie: 11500/17826
+movie: 11600/17826
+movie: 11700/17826
+movie: 11800/17826
+movie: 11900/17826
+movie: 12000/17826
+movie: 12100/17826
+movie: 12200/17826
+movie: 12300/17826
+movie: 12400/17826
+movie: 12500/17826
+movie: 12600/17826
+movie: 12700/17826
+movie: 12800/17826
+movie: 12900/17826
+movie: 13000/17826
+movie: 13100/17826
+movie: 13200/17826
+movie: 13300/17826
+movie: 13400/17826
+movie: 13500/17826
+movie: 13600/17826
+movie: 13700/17826
+movie: 13800/17826
+movie: 13900/17826
+movie: 14000/17826
+movie: 14100/17826
+movie: 14200/17826
+movie: 14300/17826
+movie: 14400/17826
+movie: 14500/17826
+movie: 14600/17826
+movie: 14700/17826
+movie: 14800/17826
+movie: 14900/17826
+movie: 15000/17826
+movie: 15100/17826
+movie: 15200/17826
+movie: 15300/17826
+movie: 15400/17826
+movie: 15500/17826
+movie: 15600/17826
+movie: 15700/17826
+movie: 15800/17826
+movie: 15900/17826
+movie: 16000/17826
+movie: 16100/17826
+movie: 16200/17826
+movie: 16300/17826
+movie: 16400/17826
+movie: 16500/17826
+movie: 16600/17826
+movie: 16700/17826
+movie: 16800/17826
+movie: 16900/17826
+movie: 17000/17826
+movie: 17100/17826
+movie: 17200/17826
+movie: 17300/17826
+movie: 17400/17826
+movie: 17500/17826
+movie: 17600/17826
+movie: 17700/17826
+movie: 17800/17826
+movie: 17826/17826
+find: 2/2
+frame: 17810
+identidade validada: 17805
+sem identidade validada: 5
+candidatos com identidade diferente: 4
+respostas 404: 17
+falhas finais: 0
+jsonl em disco: 559.0 mb
+tempo desta execução: 15.3 min
+
+---
+
+ops/venv-gestao/bin/python etl/processa_tmdb.py
+respostas 200 parseadas: 17809
+imdb_id devolvido bate com o tconst: 17805
+não bate: 4
+com certificação br: 7057
+com país: 17746
+bronze: /home/dudu/Desktop/ufsc/26.2/eps7008/e1/datalake/bronze/tmdb_filmes.parquet
+
+---
+
+ops/venv-gestao/bin/python ops/run_sql.py etl/silver_tmdb.sql > etl/silver_tmdb.log
+
+---
+
+ops/venv-gestao/bin/python ops/run_sql.py etl/gold_tmdb.sql > etl/gold_tmdb.log

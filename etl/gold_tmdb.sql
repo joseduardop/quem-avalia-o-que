@@ -14,8 +14,9 @@ select
   round(100.0 * count(*) filter (where len(t.production_countries) > 0) / count(*), 1) as pct_pais,
   count(*) filter (where len(t.production_countries) = 1) as com_um_pais_so,
   count(t.certificacao_br) as com_cert_br,
-  round(100.0 * count(t.certificacao_br) / count(*), 1) as pct_cert_br,
-  count(*) filter (where t.certificacao_br_tipo in (2, 3)) as cert_br_de_cinema,
+  count(t.classificacao_br) as com_classificacao_br,
+  round(100.0 * count(t.classificacao_br) / count(*), 1) as pct_classificacao_br,
+  count(*) filter (where t.classificacao_br is not null and t.certificacao_br_tipo in (2, 3)) as classificacao_br_de_cinema,
   count(t.certificacao_us) as com_cert_us,
   round(100.0 * count(t.certificacao_us) / count(*), 1) as pct_cert_us,
   count(*) filter (where t.certificacao_br is null and t.certificacao_us is not null) as so_cert_us
@@ -43,27 +44,27 @@ select len(production_countries) as n_paises, count(*) as filmes,
   round(100.0 * count(*) / sum(count(*)) over (), 1) as pct
 from tmdb group by 1 order by 1;
 
--- 3. classificação indicativa brasileira
+-- 3. classificação indicativa brasileira (normalizada no silver: L/10/12/14/16/18)
 create table classificacao_br as
 select
-  upper(trim(certificacao_br)) as classificacao,
+  classificacao_br as classificacao,
   count(*) as filmes,
   round(100.0 * count(*) / sum(count(*)) over (), 1) as pct_das_classificadas,
   count(*) filter (where certificacao_br_tipo in (2, 3)) as de_cinema
 from tmdb
-where certificacao_br is not null
+where classificacao_br is not null
 group by 1
-order by
-  case upper(trim(certificacao_br))
-    when 'L' then 0 when '10' then 10 when '12' then 12 when '14' then 14 when '16' then 16 when '18' then 18
-    else 99
-  end,
-  1;
+order by case classificacao_br when 'L' then 0 else classificacao_br::int end;
 select * from classificacao_br;
 copy classificacao_br to 'datalake/gold/classificacao_br.parquet' (format parquet);
 
 -- cobertura da classificação br por década: filme velho tende a não ter
-select d.decada, count(*) as filmes, count(t.certificacao_br) as com_cert_br,
-  round(100.0 * count(t.certificacao_br) / count(*), 1) as pct
+create table classificacao_br_decada as
+select d.decada, count(*) as filmes, count(t.classificacao_br) as com_classificacao_br,
+  round(100.0 * count(t.classificacao_br) / count(*), 1) as pct,
+  count(t.certificacao_us) as com_cert_us,
+  round(100.0 * count(t.certificacao_us) / count(*), 1) as pct_us
 from dim_titulo d left join tmdb t using (tconst)
 group by 1 order by 1;
+select * from classificacao_br_decada;
+copy classificacao_br_decada to 'datalake/gold/classificacao_br_decada.parquet' (format parquet);

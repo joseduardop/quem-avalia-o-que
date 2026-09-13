@@ -126,11 +126,26 @@ select * from arbitragem;
 select fonte_certa, count(*) as casos from arbitragem group by 1 order by 2 desc;
 
 -- 5. tmdb_titulo: o registro validado do tmdb, um por tconst do frame
+-- classificacao_br normaliza o texto livre do tmdb ('12 ANOS', 'E 12', 'E LIVRE', 'LIVRE') pra L/10/12/14/16/18;
+-- o que não é do sistema brasileiro ('PG', 'A', '15') vira nulo. certificacao_br fica como veio
 create table tmdb_titulo as
-select n.tconst, t.* exclude (tconst_esperado)
+select
+  n.tconst,
+  t.* exclude (tconst_esperado),
+  case
+    when upper(trim(t.certificacao_br)) in ('L', 'LIVRE', 'E LIVRE') then 'L'
+    when regexp_matches(upper(trim(t.certificacao_br)), '^(E )?(10|12|14|16|18)( ANOS)?$')
+      then regexp_extract(upper(trim(t.certificacao_br)), '(10|12|14|16|18)', 1)
+  end as classificacao_br
 from ponte_nova n
 join tmdb t on t.tconst_esperado = n.tconst and t.tmdb_id = n.tmdb_id
 where n.metodo_join not in ('nenhum', 'nao_validado');
+
+-- o que a normalização descartou
+select certificacao_br, count(*) as filmes
+from tmdb_titulo
+where certificacao_br is not null and classificacao_br is null
+group by 1 order by 2 desc;
 
 select count(*) as tmdb_titulo, count(distinct tconst) as tconst_distintos from tmdb_titulo;
 
