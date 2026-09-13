@@ -1,0 +1,7 @@
+# ponte letterboxd -> imdb -> tmdb: todo item do wikidata com slug do letterboxd (P6127) e id do imdb (P345),
+# com o id do tmdb (P4947) quando existe. gerou datalake/landing/wikidata.tsv em 13/09/2026 (269.188 linhas)
+select ?imdb ?lb ?tmdb where {
+  ?item wdt:P6127 ?lb ;
+        wdt:P345 ?imdb .
+  optional { ?item wdt:P4947 ?tmdb . }
+}
