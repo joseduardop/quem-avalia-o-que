@@ -1,7 +1,8 @@
-pyarrow
-pandas
-kaggle
-kagglehub
-duckdb
-requests
-python-dotenv
+duckdb==1.5.5
+jupytext==1.19.5
+kaggle==2.2.4
+matplotlib==3.11.2
+pandas==3.0.5
+pyarrow==25.0.1
+python-dotenv==1.2.3
+requests==2.34.2
