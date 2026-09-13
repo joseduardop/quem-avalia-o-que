@@ -1,5 +1,7 @@
 # Públicos diferentes, notas diferentes
 
+*English version: [README.en.md](README.en.md).*
+
 Primeira Entrega da disciplina de Gestão Estratégica da Tecnologia da Informação (EPS7008, UFSC/EPS). **Tese:** públicos de plataformas diferentes avaliam as mesmas obras de forma diferente - quem dá 10 no IMDb não é quem dá 5 estrelas no Letterboxd. A unidade de análise é o título; o que se mede é a divergência entre plataformas, na posição de cada filme dentro da distribuição da própria plataforma, nunca média contra média.
 
 - **E1 (15/09/2026):** análise exploratória. Este repositório é a engenharia que a sustenta.
