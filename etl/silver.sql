@@ -11,20 +11,28 @@ create view wd as select * from 'datalake/bronze/wikidata_ponte.parquet';
 
 -- 1. dim_titulo: o frame congelado. contrato do projeto, tudo que vier depois se junta a ele
 -- corte: filme, 5000+ votos no imdb, 1930-2023 (justificativa em recon/relatorio.md)
+-- pct_votos_decada vai de 0 (menos votado da década no frame) a 1 (mais votado)
 create table dim_titulo as
+with frame as (
+  select
+    b.tconst,
+    b.primaryTitle as titulo,
+    b.originalTitle as titulo_original,
+    b.startYear as ano,
+    (b.startYear // 10) * 10 as decada,
+    b.runtimeMinutes as duracao,
+    b.genres as generos,
+    r.numVotes
+  from basics b
+  join ratings r using (tconst)
+  where b.titleType = 'movie'
+    and r.numVotes >= 5000
+    and b.startYear between 1930 and 2023
+)
 select
-  b.tconst,
-  b.primaryTitle as titulo,
-  b.originalTitle as titulo_original,
-  b.startYear as ano,
-  (b.startYear // 10) * 10 as decada,
-  b.runtimeMinutes as duracao,
-  b.genres as generos
-from basics b
-join ratings r using (tconst)
-where b.titleType = 'movie'
-  and r.numVotes >= 5000
-  and b.startYear between 1930 and 2023;
+  * exclude (numVotes),
+  percent_rank() over (partition by decada order by numVotes) as pct_votos_decada
+from frame;
 
 select count(*) as dim_titulo, count(distinct tconst) as tconst_distintos from dim_titulo;
 copy dim_titulo to 'datalake/silver/dim_titulo.parquet' (format parquet);

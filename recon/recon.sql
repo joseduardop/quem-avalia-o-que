@@ -7,42 +7,42 @@
 -- e nullstr='\N' porque é assim que o imdb marca nulo
 
 create or replace view basics as
-select * from read_csv('landing/title.basics.tsv', delim='\t', header=true, quote='', nullstr='\N');
+select * from read_csv('datalake/landing/title.basics.tsv', delim='\t', header=true, quote='', nullstr='\N');
 
 create or replace view ratings as
-select * from read_csv('landing/title.ratings.tsv', delim='\t', header=true, quote='', nullstr='\N');
+select * from read_csv('datalake/landing/title.ratings.tsv', delim='\t', header=true, quote='', nullstr='\N');
 
 create or replace view akas as
-select * from read_csv('landing/title.akas.tsv', delim='\t', header=true, quote='', nullstr='\N');
+select * from read_csv('datalake/landing/title.akas.tsv', delim='\t', header=true, quote='', nullstr='\N');
 
 create or replace view links as
-select * from read_csv('landing/ml-32m/links.csv', header=true);
+select * from read_csv('datalake/landing/ml-32m/links.csv', header=true);
 
 create or replace view ml32 as
-select * from read_csv('landing/ml-32m/ratings.csv', header=true);
+select * from read_csv('datalake/landing/ml-32m/ratings.csv', header=true);
 
 create or replace view bo as
-select * from read_csv('landing/revenues_per_day.csv', header=true);
+select * from read_csv('datalake/landing/revenues_per_day.csv', header=true);
 
 -- letterboxd: o film_id pode ser a string literal 'null' (filme chamado "(NULL)")
 -- nullstr='' garante que só a string vazia vira nulo e o 'null' textual sobrevive
 create or replace view lb_films as
-select * from read_csv('landing/letterboxd-film-ratings/films.csv', header=true, nullstr='');
+select * from read_csv('datalake/landing/letterboxd-film-ratings/films.csv', header=true, nullstr='');
 
 create or replace view lb_ratings as
-select * from read_csv('landing/letterboxd-film-ratings/ratings.csv', header=true, nullstr='');
+select * from read_csv('datalake/landing/letterboxd-film-ratings/ratings.csv', header=true, nullstr='');
 
 -- ml-1m: .dat com separador '::', latin-1, sem cabeçalho
 create or replace view ml1_users as
-select * from read_csv('landing/ml-1m/users.dat', delim='::', header=false, encoding='latin-1',
+select * from read_csv('datalake/landing/ml-1m/users.dat', delim='::', header=false, encoding='latin-1',
   columns={'user_id': 'int', 'gender': 'varchar', 'age': 'int', 'occupation': 'int', 'zip': 'varchar'});
 
 create or replace view ml1_ratings as
-select * from read_csv('landing/ml-1m/ratings.dat', delim='::', header=false,
+select * from read_csv('datalake/landing/ml-1m/ratings.dat', delim='::', header=false,
   columns={'user_id': 'int', 'movie_id': 'int', 'rating': 'int', 'ts': 'bigint'});
 
 create or replace view ml1_movies as
-select * from read_csv('landing/ml-1m/movies.dat', delim='::', header=false, encoding='latin-1', quote='',
+select * from read_csv('datalake/landing/ml-1m/movies.dat', delim='::', header=false, encoding='latin-1', quote='',
   columns={'movie_id': 'int', 'title': 'varchar', 'genres': 'varchar'});
 
 -- frame do imdb: só filme, com nota. materializado porque quase toda query abaixo usa
@@ -317,7 +317,7 @@ left join movies m on m.tconst = l.tconst and m.numVotes >= 1000;
 
 -- 9d. o movieId do ml-1m é o mesmo do ml-32m? confere batendo título
 create or replace view ml32_movies as
-select * from read_csv('landing/ml-32m/movies.csv', header=true);
+select * from read_csv('datalake/landing/ml-32m/movies.csv', header=true);
 select
   count(*) as filmes_ml1,
   count(m32.movieId) as achados_no_ml32,

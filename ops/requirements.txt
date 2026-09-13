@@ -3,3 +3,5 @@ pandas
 kaggle
 kagglehub
 duckdb
+requests
+python-dotenv
