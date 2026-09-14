@@ -201,9 +201,10 @@ Reports, in order (Portuguese): `recon/relatorio.md` (sources and cut), `docs/po
 ```bash
 python -m venv ops/venv-gestao && ops/venv-gestao/bin/pip install -r ops/requirements.txt
 ops/download_fontes.sh                          # ~5 gb into datalake/landing; kaggle needed no credential
+etl/run.sh                                      # bronze and silver (~10 s); stops and asks for the crawl
 cp .env.example .env                            # tmdb key: https://www.themoviedb.org/settings/api, you must register an app
-ops/venv-gestao/bin/python ops/crawl_tmdb.py    # ~15 min
-etl/run.sh                                      # ~20 s, ends with the 26 integrity checks
+ops/venv-gestao/bin/python ops/crawl_tmdb.py    # ~15 min, reads silver to know what to fetch
+etl/run.sh                                      # now goes all the way to gold (~20 s) and ends with the 26 integrity checks
 ops/empacotar.sh                                # datalake/pacote/pacote-e1-<date>.zip
 ```
 

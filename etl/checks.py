@@ -10,8 +10,10 @@ import duckdb
 DL = "datalake"
 
 CHECKS = [
-    ("dim_titulo tem 17.810 linhas",
-     f"select abs(count(*) - 17810) from '{DL}/silver/dim_titulo.parquet'"),
+    # o frame original (dumps do imdb de 13/09/2026) tem 17.810 filmes; um dump de outro dia dá outro número,
+    # e isso é esperado. por isso os checks abaixo comparam com o dim_titulo, não com um número fixo
+    ("dim_titulo tem pelo menos 15 mil filmes (o frame original tem 17.810)",
+     f"select count(*) < 15000 from '{DL}/silver/dim_titulo.parquet'"),
     ("dim_titulo: tconst único",
      f"select count(*) - count(distinct tconst) from '{DL}/silver/dim_titulo.parquet'"),
     ("dim_titulo: ano entre 1930 e 2023 e decada = ano // 10 * 10",
@@ -53,7 +55,8 @@ CHECKS = [
     ("fato_notas: data_coleta e tipo_medida preenchidos",
      f"select count(*) from '{DL}/silver/fato_notas.parquet' where data_coleta is null or tipo_medida != 'acumulado'"),
     ("fato_notas: imdb cobre o frame inteiro",
-     f"select 17810 - count(*) from '{DL}/silver/fato_notas.parquet' where plataforma = 'imdb'"),
+     f"""select abs((select count(*) from '{DL}/silver/dim_titulo.parquet')
+                - (select count(*) from '{DL}/silver/fato_notas.parquet' where plataforma = 'imdb'))"""),
     ("fato_notas_demografia: sem duplicata (tconst, faixa, gênero)",
      f"select count(*) - count(distinct (tconst, faixa_etaria_cod, genero_usuario)) from '{DL}/silver/fato_notas_demografia.parquet'"),
     ("fato_notas_demografia: nota_media entre 1 e 5, n_notas > 0, tipo janela",
@@ -79,6 +82,8 @@ CHECKS = [
 
 def main():
     con = duckdb.connect()
+    n = con.execute(f"select count(*) from '{DL}/silver/dim_titulo.parquet'").fetchone()[0]
+    print(f"dim_titulo: {n} filmes (frame original de 13/09/2026: 17810)\n")
     falhas = 0
     largura = max(len(nome) for nome, _ in CHECKS)
     for nome, sql in CHECKS:

@@ -8,7 +8,7 @@ Todas as fontes ficam em `datalake/landing/`, fora do git (os termos de uso não
 | **TMDB API** | por filme: `external_ids` (valida o `imdb_id`), notas, países de produção, classificação indicativa, elenco, keywords | 13/09/2026, 17.858 requisições | [termos da API](https://www.themoviedb.org/api-terms-of-use); atribuição obrigatória: *This product uses the TMDB API but is not endorsed or certified by TMDB* | chave em https://www.themoviedb.org/settings/api, `.env`, `ops/crawl_tmdb.py` |
 | **MovieLens ml-32m** | `links.csv` (movieId -> imdbId, tmdbId) e `ratings.csv` (32M notas com timestamp, 1995-2023) | gerado em 13/10/2023 | uso de pesquisa, sem redistribuição; citar Harper & Konstan (2015) | `https://files.grouplens.org/datasets/movielens/ml-32m.zip` |
 | **MovieLens ml-1m** | `ratings.dat`, `users.dat` (faixa etária, gênero, ocupação), `movies.dat`; janela 04/2000-02/2003 | 2003 | idem | `https://files.grouplens.org/datasets/movielens/ml-1m.zip` |
-| **Letterboxd film ratings** (freeth, Kaggle) | `films.csv` (slug, nome, ano), `ratings.csv` (18,2M notas de 11.061 usuários) | dump de 10/10/2023 | conforme o dataset no Kaggle; é amostra de usuários pesados, não a plataforma | `kaggle datasets download -d freeth/letterboxd-film-ratings` |
+| **Letterboxd film ratings** (freeth, Kaggle) | `films.csv` (slug, nome, ano), `ratings.csv` (18,2M notas de 11.061 usuários) | dump de 10/10/2023 | CC0-1.0 (licença declarada no Kaggle); é amostra de usuários pesados, não a plataforma | `kaggle datasets download -d freeth/letterboxd-film-ratings` |
 | **Wikidata** | P6127 (slug do Letterboxd) -> P345 (IMDb) e P4947 (TMDB), 269.188 linhas | 13/09/2026 | CC0 | `ops/wikidata.sparql` via WDQS (`curl`, no script) |
 | **Box Office Mojo** (scraper de tjwaterman99) | receita diária por filme, 2000-2025 | 07/01/2025 | dado raspado de terceiros; ainda não entra no pipeline | release no GitHub (no script) |
 
@@ -16,9 +16,10 @@ Todas as fontes ficam em `datalake/landing/`, fora do git (os termos de uso não
 
 ```bash
 ops/download_fontes.sh              # ~5 gb em datalake/landing
+etl/run.sh                          # bronze e silver; para e pede o crawl
 cp .env.example .env                # e preenche a chave do tmdb
 ops/venv-gestao/bin/python ops/crawl_tmdb.py   # ~15 min, 559 mb em landing/tmdb
-etl/run.sh                          # bronze -> silver -> gold + checks, ~20 s
+etl/run.sh                          # agora bronze -> silver -> gold + checks, ~20 s
 ops/empacotar.sh                    # zip pra análise em datalake/pacote
 ```
 

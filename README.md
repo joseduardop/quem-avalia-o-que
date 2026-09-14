@@ -186,9 +186,10 @@ Relatórios, em ordem: `recon/relatorio.md` (fontes e corte), `docs/ponte-wikida
 ```bash
 python -m venv ops/venv-gestao && ops/venv-gestao/bin/pip install -r ops/requirements.txt
 ops/download_fontes.sh                          # ~5 gb em datalake/landing; kaggle não precisou de credencial
+etl/run.sh                                      # bronze e silver (~10 s); para e pede o crawl
 cp .env.example .env                            # chave do tmdb: https://www.themoviedb.org/settings/api, é preciso registrar o app
-ops/venv-gestao/bin/python ops/crawl_tmdb.py    # ~15 min
-etl/run.sh                                      # ~20 s, termina nos 26 checks de integridade
+ops/venv-gestao/bin/python ops/crawl_tmdb.py    # ~15 min, lê o silver pra saber o que buscar
+etl/run.sh                                      # agora vai até o gold (~20 s) e termina nos 26 checks de integridade
 ops/empacotar.sh                                # datalake/pacote/pacote-e1-<data>.zip
 ```
 
